@@ -3,7 +3,6 @@
 // January 31st 2014
 // This examples the ability of this library to support more than one MCP2515 based CAN interface.
 
-
 #include <mcp_can.h>
 #include <SPI.h>
 
@@ -54,8 +53,6 @@ delay(200);
 
 void loop(){  
 
-
-/*-------------------------------------------------------------------------------------------------------------------------*/
 //CAN0 Read when the interupt pin is pulled LOW
 
   if(!digitalRead(CAN0_INT))                         // If CAN0_INT pin is low, read receive buffer
@@ -81,11 +78,8 @@ void loop(){
         
     Serial.println();
   }
-/*-------------------------------------------------------------------------------------------------------------------------*/
 
-
-/*-------------------------------------------------------------------------------------------------------------------------*/
-//CAN1 Read when the interupt pin is pulled LOW
+  //CAN1 Read when the interupt pin is pulled LOW
 
   if(!digitalRead(CAN1_INT))                        // If CAN1_INT pin is low, read receive buffer
   {
@@ -111,12 +105,4 @@ void loop(){
     Serial.println();
   }
 
-/*-------------------------------------------------------------------------------------------------------------------------*/
-
-
-  
 }
-
-/*********************************************************************************************************
-  END FILE
-*********************************************************************************************************/

@@ -5,7 +5,6 @@
  *Date: 02/12/19
  */
 
-//include libraries 
 #include <mcp_can.h>                  //library for CAN communication
 #include <SPI.h>                      //SPI library
 
@@ -104,20 +103,20 @@ void setup() {
 
 
 //initialize CAN masks
-  CAN.init_Mask(0,0,0x7ff);                           //Mask 1: 0111 1111 1111
-  CAN.init_Mask(1,0,0x7ff);                           //Mask 2: 0111 1111 1111
+  CAN.init_Mask(0, 0, 0x7ff);                           //Mask 1: 0111 1111 1111
+  CAN.init_Mask(1, 0, 0x7ff);                           //Mask 2: 0111 1111 1111
 
 //initialize CAN filters
-  CAN.init_Filt(0,0,0x1F4);                           //Filter 1: 0001 1111 0100
-  CAN.init_Filt(1,0,MC_ID+3);                         //Filter 2: 0111 1101 0001
-  CAN.init_Filt(2,0,0x7D1);                           //Filter 3: 0111 1101 0001
-  CAN.init_Filt(3,0,0x7D1);                           //Filter 4: 0111 1101 0001
-  CAN.init_Filt(4,0,0x7D1);                           //Filter 5: 0111 1101 0001
-  CAN.init_Filt(5,0,0x7D1);                           //Filter 6: 0111 1101 0001
+  CAN.init_Filt(0, 0, 0x1F4);                           //Filter 1: 0001 1111 0100
+  CAN.init_Filt(1, 0, MC_ID + 3);                         //Filter 2: 0111 1101 0001
+  CAN.init_Filt(2, 0, 0x7D1);                           //Filter 3: 0111 1101 0001
+  CAN.init_Filt(3, 0, 0x7D1);                           //Filter 4: 0111 1101 0001
+  CAN.init_Filt(4, 0, 0x7D1);                           //Filter 5: 0111 1101 0001
+  CAN.init_Filt(5, 0, 0x7D1);                           //Filter 6: 0111 1101 0001
 
 //Setup Motor Power Command
-  CAN_MotorPower[0] = (float)0;                       //These bits are reserved
-  CAN_MotorPower[1] = (float)1.0;                     //Set controller to use 100% of the available BUS current 
+  CAN_MotorPower[0] = (float) 0;                       //These bits are reserved
+  CAN_MotorPower[1] = (float) 1.0;                     //Set controller to use 100% of the available BUS current 
 }
 
 void loop() {
@@ -125,29 +124,29 @@ void loop() {
 //Setup variables for receiving CAN messages
   unsigned char lenReceive = 0;                         
   unsigned char bufReceive[8];
-  unsigned char canID=0;
+  unsigned char canID = 0;
 
 //read steering wheel inpnuts
-  headLightSig=digitalRead(headLight);                                                                              //read headlight switch
+  headLightSig = digitalRead(headLight);                                                                              //read headlight switch
   togReadButtn(hazard, xHazardState, hazardState, hazardSig, hazardDebounce);                                       //read hazard button (toggle)
   readButtn(horn, xHornState, hornState, hornSig, hornDebounce);                                                    //read horn button 
   togReadButtn(left, xLeftState, leftState, leftSig, leftDebounce);                                                 //read left turn signal switch
-  if(!lastLeft&&leftSig&&rightSig){
-    rightSig=0;
+  if(!lastLeft && leftSig && rightSig){
+    rightSig = 0;
   }
-  lastLeft=leftSig;
+  lastLeft = leftSig;
   
   togReadButtn(right, xRightState, rightState, rightSig, rightDebounce);                                            //read right turn signal switch
-  if(!lastRight&&rightSig&&leftSig){
-    leftSig=0;
+  if(!lastRight && rightSig && leftSig){
+    leftSig = 0;
   }
-  lastRight=rightSig;
+  lastRight = rightSig;
   
-  revSig=digitalRead(reverse);                                                                                      //read reverse switch
+  revSig = digitalRead(reverse);                                                                                      //read reverse switch
   togReadButtn(cruiseOnOff, xCruiseOnOffState, cruiseOnOffState, cruiseOnOffSig, cruiseOnOffDebounce);              //read on/off cruise control button (toggle)
-  regenBrakeSig=digitalRead(regenBrake);                                                                            //read Regen Brake on/off switch
+  regenBrakeSig = digitalRead(regenBrake);                                                                            //read Regen Brake on/off switch
 
-  if(hazardSig){
+  if (hazardSig) {
     leftSig=0;
     rightSig=0;
   }
@@ -202,7 +201,7 @@ void loop() {
   }
 
 //Receiving CAN messages
-  if(CAN_MSGAVAIL == CAN.checkReceive()){
+  if (CAN_MSGAVAIL == CAN.checkReceive()) {
     CAN.readMsgBuf(&lenReceive, bufReceive);      //Read data,  lenReceive: data length, bufReceive: data buffer
     canID = CAN.getCanId();                       //Read the message id associated with this CAN message (also called a CAN frame)
     
@@ -217,56 +216,56 @@ void loop() {
     Serial.println();*/
 
 //Processing received messages
-    if(canID == Brake_ID){                        //Check if message from brakes
-      for(unsigned i=0; i<8; i++){
-        Brakes[i]=bufReceive[i];                  //Load receive buffer into brake buffer
+    if (canID == Brake_ID){                        //Check if message from brakes
+      for (unsigned i=0; i<8; i++) {
+        Brakes[i] = bufReceive[i];                  //Load receive buffer into brake buffer
       }
     }
 
-    if(canID=MC_ID+3){                            //Check if message id is motor velocity
-      for(unsigned i=0; i<8; i++){
-        VelocityBuf[i]=bufReceive[i];             //Load receive buffer into velocity buffer
+    if (canID = MC_ID + 3) {                            //Check if message id is motor velocity
+      for (unsigned i = 0; i < 8; i++) {
+        VelocityBuf[i] = bufReceive[i];             //Load receive buffer into velocity buffer
       }
     }
 
 currMotorRPM = (int)unpackFloat(VelocityBuf[4]);
-  currVehVel = (int)unpackFloat(VelocityBuf[0]);
+currVehVel = (int)unpackFloat(VelocityBuf[0]);
   
-if(!cruiseOnOff){
-  vehicleVelocity=currVehVel;
+if (!cruiseOnOff) {
+  vehicleVelocity = currVehVel;
 }
   }
 
 //MotorDrive buffer code  
-  if(Brakes[0]){                                                                                                      //Check if Brakes are on
-    CAN_MotorDrive[0]=(float)0;
-    CAN_MotorDrive[1]=(float)0;
-    if (cruiseOnOffSig){
-    cruiseOnOffSig = 0;
+  if (Brakes[0]) {                                                                                                      //Check if Brakes are on
+    CAN_MotorDrive[0] = (float)0;
+    CAN_MotorDrive[1] = (float)0;
+    if (cruiseOnOffSig) {
+      cruiseOnOffSig = 0;
     }
   }
-  else if(cruiseOnOffSig){                                                                                               //Check if cruise control is on
-    CAN_MotorDrive[0]=vehicleVelocity;            
-    CAN_MotorDrive[1]=(float)1.0;
+  else if (cruiseOnOffSig) {                                                                                               //Check if cruise control is on
+    CAN_MotorDrive[0] = vehicleVelocity;            
+    CAN_MotorDrive[1] = (float)1.0;
     readButtn(cruiseIncSpeed, xCruiseIncSpeedState, cruiseIncSpeedState, cruiseIncSpeedSig, cruiseIncSpeedDebounce);  //read increase cruise control button
     readButtn(cruiseDecSpeed, xCruiseDecSpeedState, cruiseDecSpeedState, cruiseDecSpeedSig, cruiseDecSpeedDebounce);  //read decrease cruise controll button
     
-    if(cruiseIncSpeedSig){                                                                                            //Check if 
+    if (cruiseIncSpeedSig) {                                                                                            //Check if 
       vehicleVelocity++;    
     }
-    else if(cruiseDecSpeedSig){
+    else if (cruiseDecSpeedSig) {
       vehicleVelocity--;
     }
   }
-  else if(revSig){                                                                                                     //Check if Reverse switch is on
+  else if (revSig) {  //Check if Reverse switch is on
     potRead(acceleration, accRaw, accFloat, accPotMin, accPotMax);                                                     //read acceleration potentiometer  
-    CAN_MotorDrive[0]=(float)-100;
-    CAN_MotorDrive[1]=accFloat;
+    CAN_MotorDrive[0] = (float)-100;
+    CAN_MotorDrive[1] = accFloat;
   }
-  else{
+  else {
     potRead(acceleration, accRaw, accFloat, accPotMin, accPotMax);                                                      //read acceleration potentiometer  
-    CAN_MotorDrive[0]=(float)100;
-    CAN_MotorDrive[1]=accFloat;
+    CAN_MotorDrive[0] = (float)100;
+    CAN_MotorDrive[1] = accFloat;
   }
   
 
