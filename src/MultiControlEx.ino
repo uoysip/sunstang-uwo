@@ -15,7 +15,7 @@ char msgString[128];                        // Array to store serial string
 MCP_CAN CAN0(10);                               // Set CAN0 CS to pin 10
 
 #define CAN1_INT 3                              // Set CAN1 INT to pin 2
-MCP_CAN CAN1(8);                               //  Set CAN1 CS to pin 9
+MCP_CAN CAN1(9);                               //  Set CAN1 CS to pin 9
 
 
 
