@@ -99,7 +99,7 @@ void setup() {
   pinMode(testLED3, OUTPUT);                          //Test LED #3 output
 
 //Initialize CAN bus
-  CAN.begin(CAN_500KBPS);                             //Init can bus : baudrate = 500k
+  CAN.begin(CAN_1000KBPS);                             //Init can bus : baudrate = 1000k
 
 
 //initialize CAN masks

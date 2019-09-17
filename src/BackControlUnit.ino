@@ -36,7 +36,7 @@ void setup() {
   pinMode(brakes, OUTPUT);                               //Brake output
 
   //Initialize CAN bus
-  CAN.begin(CAN_500KBPS);              //Init can bus : baudrate = 500k
+  CAN.begin(CAN_1000KBPS);              //Init can bus : baudrate = 1000k
 
   CAN.init_Mask(0, 0, 0x7ff);                               //Mask 1: 0111 1111 1111
   CAN.init_Mask(1, 0, 0x7ff);                               //Mask 2: 0111 1111 1111        

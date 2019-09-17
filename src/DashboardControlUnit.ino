@@ -25,7 +25,7 @@ void setup() {
   pinMode(brakes, INPUT);                            //brake signal input
 
   START_INIT:
-  if (CAN_OK == CAN.begin(CAN_500KBPS)) {             //Initialize CAN bus: baudrate = 500k
+  if (CAN_OK == CAN.begin(CAN_1000KBPS)) {             //Initialize CAN bus: baudrate = 1000k
     Serial.println("CAN BUS Shield init ok!");  
   } else {
     Serial.println("CAN BUS Shield init fail"); 

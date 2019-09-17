@@ -34,7 +34,7 @@ void setup() {
   Serial.begin(9600);                           //Baudrate: 9600
 
   //Initialize CAN bus
-  CAN.begin(CAN_500KBPS);                         //Initialize CAN bus; Baudrate = 500k
+  CAN.begin(CAN_1000KBPS);                         //Initialize CAN bus; Baudrate = 1000k
     
   //pinmodes 
   pinMode(leftLED, OUTPUT);                       //Left turn signal output

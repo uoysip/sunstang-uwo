@@ -25,7 +25,7 @@ void setup() {
   Serial.begin(115200);
 
   // Initialize CAN bus 
-  while (CAN_OK != CAN.begin(CAN_500KBPS)) {        // Baudrate: 500K
+  while (CAN_OK != CAN.begin(CAN_1000KBPS)) {        // Baudrate: 1000K
     Serial.println("CAN BUS init fail");
     Serial.println("Init CAN BUS again");
     delay(100);
