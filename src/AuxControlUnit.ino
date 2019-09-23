@@ -1,95 +1,40 @@
-/* 
- *  Description: Code for the Auxillary Control Unit
- *  Version: 2
- *  Author: Steven Lawrence
- *  Date: 01/06/19
-*/
- 
-#include <mcp_can.h>                // library for CAN communication
-#include <SPI.h>                        // library for SPI
+#include "AuxControlUnit.h"
+#include <Stream.h>
 
-const int mainSwGate = 7;             // Pin for Main-Switched MOSFET
-const int suppSwGate = 8;             // Pin for Supp-Switched MOSFET
-const int SPI_CS_PIN = 10;            // CAN chip select pin 
-
-unsigned long Battery_OK_ID = 0x10;   //CAN ID for battery status message
-
-byte BattOk[8];                                 // Recieve Buffer for battery OK message
-
-bool batteryOk = 0;                            // Switched power line MOSFET selectin variable
-  
-MCP_CAN CAN(SPI_CS_PIN);                // Initialize CAN object
+MCP_CAN CAN(kSPIpin);
 
 void setup() {
-  // Initialize Serial Monitor w/ baudrate 115200
+  // begin serial communication at 115200 bits per second and initialize the CAN bus at 1000 kilobits per second
   Serial.begin(115200);
+  CAN.initialize(CAN_1000KBPS);
 
-  // Initialize CAN bus 
-  while (CAN_OK != CAN.begin(CAN_1000KBPS)) {        // Baudrate: 1000K
-    Serial.println("CAN BUS init fail");
-    Serial.println("Init CAN BUS again");
-    delay(100);
-  }
+  // set the Main and Supplementary switched MOSFET gates to output
+  pinMode(kMainSwGate, OUTPUT);
+  pinMode(kSuppSwGate, OUTPUT);   
 
-  Serial.println("CAN BUS init ok!");            // CAN bus initialization successful
+  // set CAN mask and filter acceptance registers for receiving messages
+  // information on CAN masks and filters can be found on the wiki
+  CAN.maskRange(0, 1, 0, 0x7ff);    // Mask: 0111 1111 1111
+  CAN.filterRange(0, 5, 0, 0x7D1);  // Filter: 0111 1101 0001
 
-  // pinmodes 
-  pinMode(mainSwGate, OUTPUT);                    // Main-Switched MOSFET gate output
-  pinMode(suppSwGate, OUTPUT);                    // Supp-Switched MOSFET gate output
-    
-  // initialize CAN masks
-  CAN.init_Mask(0, 0, 0x7ff);                       // Mask 1: 0111 1111 1111
-  CAN.init_Mask(1, 0, 0x7ff);                       // Mask 2: 0111 1111 1111
-
-  // initialize CAN filters
-  CAN.init_Filt(0, 0, 0x7D1);                       // Filter 1: 0111 1101 0001
-  CAN.init_Filt(1, 0, 0x7D1);                       // Filter 2: 0111 1101 0001
-  CAN.init_Filt(2, 0, 0x7D1);                       // Filter 3: 0111 1101 0001
-  CAN.init_Filt(3, 0, 0x7D1);                       // Filter 4: 0111 1101 0001
-  CAN.init_Filt(4, 0, 0x7D1);                       // Filter 5: 0111 1101 0001
-  CAN.init_Filt(5, 0, 0x7D1);                       // Filter 6: 0111 1101 0001
-
-  digitalWrite(suppSwGate, HIGH);                 // Turn on the supp-Switched MOSFET
+  // enable the Supplementary-switched MOSFET
+  digitalWrite(kSuppSwGate, HIGH);
 }
 
 void loop() {
-  // Setup variables for receiving CAN messages
-  unsigned char lenReceive = 0;          // Data length
-  unsigned char bufReceive[8];          // Receive data buffer
-  unsigned long canID=0;                  // CAN ID
-
-  // Receiving messages
-  if (CAN_MSGAVAIL == CAN.checkReceive()) {
-    CAN.readMsgBuf(&lenReceive, bufReceive);      // Read data,  lenReceive: data length, bufReceive: data buffer
-    canID = CAN.getCanId();                                 // Read the message id associated with this CAN message (also called a CAN frame)
+  // check if the CAN bus has a message to be read
+  if (CAN.hasMessage()) {
+    // store the message from the CAN bus
+    struct MessageFrame message = receiveMsg(CAN);
     
-    Serial.print("Sensor Value from ID: ");             // Print the ID of the CAN message
-    Serial.print(canID);
-    Serial.print(" = ");
-    
-    // Print the data from the CAN message
-    for (int i = 0; i < lenReceive; i++){         
-      Serial.print(bufReceive[i]);
-      Serial.print("\t");
+    // if the message is from the BPS then load the receive buffer into BattOk and change the power source if necessary
+    if (message.canID == kBatteryOkID) {
+      // BattOk used to store the receive buffer if the message is relevant
+      byte BattOk[8];
+      message.receiveBuffer.readBytes(BattOk, 8);
+      
+      // update the power source
+      switchPower(battOk[0]);
     }
-    Serial.println();
-
-    // Processing received messages
-    if (canID ==  Battery_OK_ID) {                  // Check if message is from BPS
-      for (unsigned i = 0; i < 8; i++) {
-        BattOk[i] = bufReceive[i];                  // Load receive buffer into battery ok buffer
-      }
-    }
-  }
-
-  batteryOk = BattOk[0];                            // Update batteryOk variable
-
-  // Switched power line MOSFETs control
-  if (batteryOk) {                                  // Check status of main battery pack
-    digitalWrite(mainSwGate, HIGH);               // Turn on main-Switched MOSFET
-    digitalWrite(suppSwGate, LOW);                // Turn off supp-Switched MOSFET
-  } else {
-    digitalWrite(suppSwGate, HIGH);                // Turn on supp-Switched MOSFET
-    digitalWrite(mainSwGate, LOW);                // Turn off main-Switched MOSFET
   }
 }
