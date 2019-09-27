@@ -9,7 +9,7 @@ static const int kSPIpin = 10;
 static const unsigned long kBatteryOkID = 0x10; // TODO: can this become an unsigned int instead?
 
 class AuxControlUnit : public GeneralControlUnit {
-  private: 
+  protected: 
     switchPower(bool batteryStatus);    // switches power to supp if batteryStatus is false, switches to main if true.
 };
 
