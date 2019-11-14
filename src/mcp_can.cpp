@@ -107,7 +107,7 @@ void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], co
        
     for (i=0; i<n; i++) 
         spi_readwrite(values[i]);
-	
+    
     MCP2515_UNSELECT();
     SPI.endTransaction();
 }
@@ -272,7 +272,7 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed, const INT8U canClock)
 
             default:
             set = 0;
-	    return MCP2515_FAIL;
+        return MCP2515_FAIL;
             break;
         }
         break;
@@ -359,7 +359,7 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed, const INT8U canClock)
 
             default:
             set = 0;
-	    return MCP2515_FAIL;
+        return MCP2515_FAIL;
             break;
         }
         break;
@@ -430,7 +430,7 @@ INT8U MCP_CAN::mcp2515_configRate(const INT8U canSpeed, const INT8U canClock)
         
         default:
         set = 0;
-	return MCP2515_FAIL;
+    return MCP2515_FAIL;
         break;
     }
 
@@ -457,14 +457,14 @@ void MCP_CAN::mcp2515_initCANBuffers(void)
     INT32U ulMask = 0x00, ulFilt = 0x00;
 
 
-    mcp2515_write_mf(MCP_RXM0SIDH, ext, ulMask);			/*Set both masks to 0           */
-    mcp2515_write_mf(MCP_RXM1SIDH, ext, ulMask);			/*Mask register ignores ext bit */
+    mcp2515_write_mf(MCP_RXM0SIDH, ext, ulMask);            /*Set both masks to 0           */
+    mcp2515_write_mf(MCP_RXM1SIDH, ext, ulMask);            /*Mask register ignores ext bit */
     
                                                                         /* Set all filters to 0         */
-    mcp2515_write_mf(MCP_RXF0SIDH, ext, ulFilt);			/* RXB0: extended               */
-    mcp2515_write_mf(MCP_RXF1SIDH, std, ulFilt);			/* RXB1: standard               */
-    mcp2515_write_mf(MCP_RXF2SIDH, ext, ulFilt);			/* RXB2: extended               */
-    mcp2515_write_mf(MCP_RXF3SIDH, std, ulFilt);			/* RXB3: standard               */
+    mcp2515_write_mf(MCP_RXF0SIDH, ext, ulFilt);            /* RXB0: extended               */
+    mcp2515_write_mf(MCP_RXF1SIDH, std, ulFilt);            /* RXB1: standard               */
+    mcp2515_write_mf(MCP_RXF2SIDH, ext, ulFilt);            /* RXB2: extended               */
+    mcp2515_write_mf(MCP_RXF3SIDH, std, ulFilt);            /* RXB3: standard               */
     mcp2515_write_mf(MCP_RXF4SIDH, ext, ulFilt);
     mcp2515_write_mf(MCP_RXF5SIDH, std, ulFilt);
 
@@ -531,10 +531,10 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canIDMode, const INT8U canSpeed, const I
                                                                         /* interrupt mode               */
         mcp2515_setRegister(MCP_CANINTE, MCP_RX0IF | MCP_RX1IF);
 
-	//Sets BF pins as GPO
-	mcp2515_setRegister(MCP_BFPCTRL,MCP_BxBFS_MASK | MCP_BxBFE_MASK);
-	//Sets RTS pins as GPI
-	mcp2515_setRegister(MCP_TXRTSCTRL,0x00);
+    //Sets BF pins as GPO
+    mcp2515_setRegister(MCP_BFPCTRL,MCP_BxBFS_MASK | MCP_BxBFE_MASK);
+    //Sets RTS pins as GPI
+    mcp2515_setRegister(MCP_TXRTSCTRL,0x00);
 
         switch(canIDMode)
         {
@@ -692,7 +692,7 @@ void MCP_CAN::mcp2515_write_canMsg( const INT8U buffer_sidh_addr)
     INT8U mcp_addr;
     mcp_addr = buffer_sidh_addr;
     mcp2515_setRegisterS(mcp_addr+5, m_nDta, m_nDlc );                  /* write data bytes             */
-	
+    
     if ( m_nRtr == 1)                                                   /* if RTR set bit in byte       */
         m_nDlc |= MCP_RTR_MASK;  
 
@@ -770,6 +770,13 @@ INT8U MCP_CAN::begin(INT8U idmodeset, INT8U speedset, INT8U clockset)
     INT8U res;
 
     SPI.begin();
+    // idmodeset is the type of can message it is,
+            // #define MCP_STDEXT   0                                                  /* Standard and Extended        */
+            // #define MCP_STD      1                                                  /* Standard IDs ONLY            */
+            // #define MCP_EXT      2                                                  /* Extended IDs ONLY            */
+            // #define MCP_ANY      3                                                  /* Disables Masks and Filters   */
+    // speedset is the baudrate
+    // clockset is the clockrate, our chips will be using MCP_16MHZ unless otherwise noted
     res = mcp2515_init(idmodeset, speedset, clockset);
     if (res == MCP2515_OK)
         return CAN_OK;
@@ -790,9 +797,9 @@ INT8U MCP_CAN::init_Mask(INT8U num, INT8U ext, INT32U ulData)
     res = mcp2515_setCANCTRL_Mode(MODE_CONFIG);
     if(res > 0){
 #if DEBUG_MODE
-	Serial.print("Entering Configuration Mode Failure...\r\n"); 
+    Serial.print("Entering Configuration Mode Failure...\r\n"); 
 #endif
-	return res;
+    return res;
      }
     
     if (num == 0){
@@ -807,9 +814,9 @@ INT8U MCP_CAN::init_Mask(INT8U num, INT8U ext, INT32U ulData)
     res = mcp2515_setCANCTRL_Mode(mcpMode);
     if(res > 0){
 #if DEBUG_MODE
-	Serial.print("Entering Previous Mode Failure...\r\nSetting Mask Failure...\r\n"); 
+    Serial.print("Entering Previous Mode Failure...\r\nSetting Mask Failure...\r\n"); 
 #endif
-	return res;
+    return res;
     }
 #if DEBUG_MODE
     Serial.print("Setting Mask Successful!\r\n");
@@ -1007,7 +1014,7 @@ INT8U MCP_CAN::setMsg(INT32U id, INT8U rtr, INT8U ext, INT8U len, INT8U *pData)
     m_nDlc    = len;
     for(i = 0; i<MAX_CHAR_IN_MESSAGE; i++)
         m_nDta[i] = *(pData+i);
-	
+    
     return MCP2515_OK;
 }
 
@@ -1053,11 +1060,11 @@ INT8U MCP_CAN::sendMsg()
     do
     {
         uiTimeOut++;        
-        res1 = mcp2515_readRegister(txbuf_n-1);                         /* read send buff ctrl reg 	*/
-        res1 = res1 & 0x08;                               		
+        res1 = mcp2515_readRegister(txbuf_n-1);                         /* read send buff ctrl reg  */
+        res1 = res1 & 0x08;                                     
     } while (res1 && (uiTimeOut < TIMEOUTVALUE));   
     
-    if(uiTimeOut == TIMEOUTVALUE)                                       /* send msg timeout             */	
+    if(uiTimeOut == TIMEOUTVALUE)                                       /* send msg timeout             */  
         return CAN_SENDMSGTIMEOUT;
     
     return CAN_OK;
@@ -1070,7 +1077,7 @@ INT8U MCP_CAN::sendMsg()
 INT8U MCP_CAN::sendMsgBuf(INT32U id, INT8U ext, INT8U len, INT8U *buf)
 {
     INT8U res;
-	
+    
     setMsg(id, 0, ext, len, buf);
     res = sendMsg();
     
@@ -1133,8 +1140,8 @@ INT8U MCP_CAN::readMsg()
 INT8U MCP_CAN::readMsgBuf(INT32U *id, INT8U *ext, INT8U *len, INT8U buf[])
 {
     if(readMsg() == CAN_NOMSG)
-	return CAN_NOMSG;
-	
+    return CAN_NOMSG;
+    
     *id  = m_nID;
     *len = m_nDlc;
     *ext = m_nExtFlg;
@@ -1151,14 +1158,14 @@ INT8U MCP_CAN::readMsgBuf(INT32U *id, INT8U *ext, INT8U *len, INT8U buf[])
 INT8U MCP_CAN::readMsgBuf(INT32U *id, INT8U *len, INT8U buf[])
 {
     if(readMsg() == CAN_NOMSG)
-	return CAN_NOMSG;
+    return CAN_NOMSG;
 
     if (m_nExtFlg)
         m_nID |= 0x80000000;
 
     if (m_nRtr)
         m_nID |= 0x40000000;
-	
+    
     *id  = m_nID;
     *len = m_nDlc;
     
@@ -1231,9 +1238,9 @@ INT8U MCP_CAN::enOneShotTX(void)
 {
     mcp2515_modifyRegister(MCP_CANCTRL, MODE_ONESHOT, MODE_ONESHOT);
     if((mcp2515_readRegister(MCP_CANCTRL) & MODE_ONESHOT) != MODE_ONESHOT)
-	    return CAN_FAIL;
+        return CAN_FAIL;
     else
-	    return CAN_OK;
+        return CAN_OK;
 }
 
 /*********************************************************************************************************
@@ -1256,12 +1263,12 @@ INT8U MCP_CAN::disOneShotTX(void)
 INT8U MCP_CAN::abortTX(void)                             
 {
     mcp2515_modifyRegister(MCP_CANCTRL, ABORT_TX, ABORT_TX);
-	
+    
     // Maybe check to see if the TX buffer transmission request bits are cleared instead?
     if((mcp2515_readRegister(MCP_CANCTRL) & ABORT_TX) != ABORT_TX)
-	    return CAN_FAIL;
+        return CAN_FAIL;
     else
-	    return CAN_OK;
+        return CAN_OK;
 }
 
 /*********************************************************************************************************
@@ -1271,7 +1278,7 @@ INT8U MCP_CAN::abortTX(void)
 INT8U MCP_CAN::setGPO(INT8U data)
 {
     mcp2515_modifyRegister(MCP_BFPCTRL, MCP_BxBFS_MASK, (data<<4));
-	    
+        
     return 0;
 }
 
@@ -1284,4 +1291,121 @@ INT8U MCP_CAN::getGPI(void)
     INT8U res;
     res = mcp2515_readRegister(MCP_TXRTSCTRL) & MCP_BxRTS_MASK;
     return (res >> 3);
+}
+
+
+//! DEPRECIATE THIS METHOD, OR ADD PROPER ERROR HANDLING!
+
+// ********************************************************************************************************
+// ** Function name:           initialize
+// ** Descriptions:            Public function to declare controller initialization parameters with error handling
+// ********************************************************************************************************
+// void MCP_CAN::initialize(INT8U baudRate)
+// {
+//   // TODO: add proper error handling
+//   while (begin(baudRate) != CAN_OK) {
+//     Serial.println("CAN BUS initialization failed, reattempting...");
+//     delay(100);
+//   }
+
+//   #if DEBUG_MODE
+//     Serial.println("CAN BUS initialization successful");
+//   #endif
+// }
+
+/*********************************************************************************************************
+** Function name:           hasMessage
+** Descriptions:            DEPRECIATED Public function, checks if the CAN bus has a message to be received
+*********************************************************************************************************/
+bool MCP_CAN::hasMessage(void)
+{
+    return MCP_CAN::checkReceive() == CAN_MSGAVAIL;
+}
+
+// /*********************************************************************************************************
+// ** Function name:           receiveMsg
+// ** Descriptions:            Public function, receives a message from the CAN bus.
+// **                               it is the responsibility of the user to check if the CAN bus has a message to
+// **                               receive first, this can be checked by calling hasMessage() from an if statement
+// **                               outside of where receiveMsg will be called.
+// *********************************************************************************************************/
+// MCP_CAN::MessageFrame MCP_CAN::receiveMsg(void) 
+// {
+//   MessageFrame message;
+
+//   // store the data length, receive buffer, and CAN ID into the message struct
+//   readMsgBuf(message.dataLen, message.receiveBuffer);
+//   message.canID = m_nID; //! m_nID is the CAN ID, however, the original implementation of message receive may be erroneous
+    
+//   // print to the Serial communication the information about the message
+//   #if DEBUG_MODE
+//     Serial.print("Sensor Value from ID: " + message.canID + " = ");
+
+//     // TODO: this can be replaced by using the Stream lib
+//     for (int i = 0; i < message.dataLen; i++) {
+//       Serial.print(receiveBuffer[i] + "\t");
+//     }
+//     Serial.println();
+//   #endif
+
+//   return message;
+
+// }
+
+/*********************************************************************************************************
+** Function name:           maskRange
+** Descriptions:            Public function to set a range of acceptance mask registers (upto 2)
+*                                registers MCP_RXM0SIDH and MCP_RXM1SIDH
+*********************************************************************************************************/
+//void maskRange(INT8U start, INT8U end, INT8U ext, INT32U ulData);    // new
+void MCP_CAN::maskRange(INT8U start, INT8U end, INT8U ext, INT32U ulData)
+{ 
+  // TODO: add proper error handling
+  // catch erroneous lower and upper bound inputs
+  if ((start < 0) || start > 1 || end <= 0 || end > 5 ) {
+    #if DEBUG_MODE
+      // Serial.println("ERROR: Invalid range for mask acceptance registers... " + "Lower bound: " + start + ", Upper bound: " + end + ".");
+      Serial.print("ERROR: Invalid range for mask acceptance registers... ");
+      Serial.print("Lower bound: ");
+      Serial.print(start);
+      Serial.print(", Upper bound: ");
+      Serial.print(end);
+      Serial.print(".");
+    #endif
+    return; // TODO: return 1 if successful, -1 if unsuccessful
+  }
+
+  // set the acceptance mask register(s)
+  for (int i = start; i <= end; i++) {
+    init_Mask(i, ext, ulData);
+  }
+}
+
+/*********************************************************************************************************
+** Function name:           maskFilter
+** Descriptions:            Public function that sets a range of acceptance filter registers (upto 6) to update to ulData (the new filter)
+*                                registers MCP_RXF0SIDH - MCP_RXF5SIDH
+*********************************************************************************************************/
+void MCP_CAN::filterRange(INT8U start, INT8U end, INT8U ext, INT32U ulData)
+{ 
+  // TODO: add proper error handling
+  // catch erroneous lower and upper bound inputs
+if ((start < 0) || start > 5 || end <= 0 || end > 5 ) {
+    #if DEBUG_MODE
+      // Serial.println("ERROR: Invalid range for filter acceptance registers... " + "Lower bound: " + start + ", Upper bound: " + end + ".");
+      Serial.print("ERROR: Invalid range for mask acceptance registers... ");
+      Serial.print("Lower bound: ");
+      Serial.print(start);
+      Serial.print(", Upper bound: ");
+      Serial.print(end);
+      Serial.print(".");
+    #endif
+
+    return; // TODO: return 1 if successful, -1 if unsuccessful
+  }
+
+  // set the acceptance filter register(s)
+  for (int i = start; i <= end; i++) {
+    init_Filt(i, ext, ulData);
+  }
 }

@@ -35,7 +35,7 @@ class MCP_CAN
                                                                         // Extended (29 bit) or Standard (11 bit)
     INT32U  m_nID;                                                      // CAN ID
     INT8U   m_nDlc;                                                     // Data Length Code
-    INT8U   m_nDta[MAX_CHAR_IN_MESSAGE];                            	// Data array
+    INT8U   m_nDta[MAX_CHAR_IN_MESSAGE];                              // Data array
     INT8U   m_nRtr;                                                     // Remote request flag
     INT8U   m_nfilhit;                                                  // The number of the filter that matched the message
     INT8U   MCPCS;                                                      // Chip Select pin number
@@ -53,7 +53,7 @@ class MCP_CAN
     INT8U mcp2515_readRegister(const INT8U address);                    // Read MCP2515 register
     
     void mcp2515_readRegisterS(const INT8U address,                     // Read MCP2515 successive registers
-	                             INT8U values[], 
+                               INT8U values[], 
                                const INT8U n);
    
     void mcp2515_setRegister(const INT8U address,                       // Set MCP2515 register
@@ -77,17 +77,17 @@ class MCP_CAN
     INT8U mcp2515_init(const INT8U canIDMode,                           // Initialize Controller
                        const INT8U canSpeed,
                        const INT8U canClock);
-		       
+           
     void mcp2515_write_mf( const INT8U mcp_addr,                        // Write CAN Mask or Filter
                            const INT8U ext,
                            const INT32U id );
-			       
+             
     void mcp2515_write_id( const INT8U mcp_addr,                        // Write CAN ID
                            const INT8U ext,
                            const INT32U id );
 
     void mcp2515_read_id( const INT8U mcp_addr,                         // Read CAN ID
-				INT8U* ext,
+        INT8U* ext,
                                 INT32U* id );
 
     void mcp2515_write_canMsg( const INT8U buffer_sidh_addr );          // Write CAN message
@@ -104,6 +104,13 @@ class MCP_CAN
     INT8U sendMsg();                                                    // Send message
 
 public:
+    struct MessageFrame {
+      INT8U dataLen = 0;
+      INT8U receiveBuffer[8];
+      INT32U canID = -1;
+      INT8U ext; // not used in our implementation; only using standard ID's
+    };
+
     MCP_CAN(INT8U _CS);
     INT8U begin(INT8U idmodeset, INT8U speedset, INT8U clockset);       // Initialize controller parameters
     INT8U init_Mask(INT8U num, INT8U ext, INT32U ulData);               // Initialize Mask(s)
@@ -125,6 +132,11 @@ public:
     INT8U abortTX(void);                                                // Abort queued transmission(s)
     INT8U setGPO(INT8U data);                                           // Sets GPO
     INT8U getGPI(void);                                                 // Reads GPI
+    // void initialize(INT8U baudRate); // NEW
+    bool hasMessage();                              // NEW
+    MessageFrame receiveMsg();                             // NEW
+    void maskRange(INT8U start, INT8U end, INT8U ext, INT32U ulData);    // new
+    void filterRange(INT8U start, INT8U end, INT8U ext, INT32U ulData);    // new  
 };
 
 #endif
