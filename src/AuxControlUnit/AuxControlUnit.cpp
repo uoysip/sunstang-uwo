@@ -1,7 +1,11 @@
 #include "AuxControlUnit.h"
 
+AuxControlUnit::AuxControlUnit() {
+  // constructor
+}
+
 // switches power between the Main-switched gate and the Supplementary-switched gate
-static void switchPower(bool batteryOK) {
+static void AuxControlUnit::switchPower(bool batteryOK) {
   // TODO: set pinModes to OUTPUT in a fucntion.
   if (batteryOK) {
     digitalWrite(kMainSwGate, HIGH);   // enable Main-switched power

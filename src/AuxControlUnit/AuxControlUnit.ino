@@ -6,7 +6,8 @@ MCP_CAN CAN(kSPIpin);
 void setup() {
   // begin serial communication at 115200 bits per second and initialize the CAN bus at 1000 kilobits per second
   Serial.begin(115200);
-  CAN.initialize(CAN_1000KBPS);
+  // CAN.initialize(CAN_1000KBPS);
+  CAN.begin(MCP_STD, CAN_1000KBPS, MCP_16MHZ);
 
   // set the Main and Supplementary switched MOSFET gates to output
   pinMode(kMainSwGate, OUTPUT);
@@ -25,16 +26,15 @@ void loop() {
   // check if the CAN bus has a message to be read
   if (CAN.hasMessage()) {
     // store the message from the CAN bus
-    struct MessageFrame message = receiveMsg(CAN);
+    MCP_CAN::MessageFrame message;
+    CAN.readMsgBuf(&message.canID, &message.dataLen, message.receiveBuffer);
     
-    // if the message is from the BPS then load the receive buffer into BattOk and change the power source if necessary
+    // if the message is from the BPS then change the power source (if the message deems that necessary)
     if (message.canID == kBatteryOkID) {
-      // BattOk used to store the receive buffer if the message is relevant
-      byte BattOk[8];
-      message.receiveBuffer.readBytes(BattOk, 8);
-      
       // update the power source
-      switchPower(battOk[0]);
+      bool batteryOK = (bool) message.receiveBuffer[0];
+      
+      AuxControlUnit::switchPower((bool) message.receiveBuffer[0]);
     }
   }
 }
