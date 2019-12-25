@@ -37,7 +37,14 @@
 #endif
 
 // if print debug information
-#define DEBUG_MODE 1
+#define DEBUG_MODE 1                              // debug all classes
+#define DEBUG_MODE_AUX 0                    // debug AuxControlUnit
+#define DEBUG_MODE_BACK 0                  // debug BackControlUnit
+#define DEBUG_MODE_FRONT 0                // debug FrontControlUnit
+#define DEBUG_MODE_DASHBOARD 0        // debug DashboardControlUnit
+#define DEBUG_MODE_GENERAL 0            // debug GeneralControlUnit
+#define DEBUG_MODE_GENERAL_LIGHT 0  // debug GeneralLightControlUnit
+#define DEBUG_MODE_STEERING 0           // debug SteeringControlUnit
 
 /*
  *   Begin mt
