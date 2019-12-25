@@ -1,4 +1,5 @@
-#include "mcp_can.h"                  //library for CAN communication
+#include "SteeringControlUnit.h"
+
 MCP_CAN CAN(SPI_CS_PIN);              //init CAN object
 
 void setup() {
